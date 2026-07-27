@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code - Xây dựng ứng dụng hoàn chỉnh | Softech Aptech Đà Nẵng</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'bg-dark': '#090A14',
+                        'bg-card': '#13141F',
+                        'brand': '#DF6B33',
+                        'brand-light': '#FBA26A',
+                        'brand-dark': '#B85220',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: #090A14;
+            color: #e5e7eb;
+            overflow-x: hidden;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #090A14; }
+        ::-webkit-scrollbar-thumb { background: #DF6B33; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FBA26A; }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(90deg, #DF6B33 0%, #FBA26A 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        /* Hero image glow */
+        .hero-glow {
+            box-shadow: 0 0 40px rgba(223, 107, 51, 0.3);
+            position: relative;
+        }
+        .hero-glow::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(223,107,51,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* CTA button */
+        .btn-primary {
+            background-color: #DF6B33;
+            transition: all 300ms ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: #B85220;
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(223, 107, 51, 0.4);
+        }
+
+        .btn-outline {
+            border: 1px solid #4b5563;
+            transition: all 300ms ease-in-out;
+        }
+        .btn-outline:hover {
+            border-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Card hover */
+        .card-hover {
+            transition: all 300ms ease-in-out;
+        }
+        .card-hover:hover {
+            border-color: #DF6B33;
+            transform: translateY(-4px);
+        }
+
+        /* Nav transition */
+        .navbar {
+            transition: background-color 300ms ease-in-out, backdrop-filter 300ms ease-in-out;
+        }
+        .navbar.scrolled {
+            background-color: rgba(9, 10, 20, 0.95) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(223, 107, 51, 0.2);
+        }
+
+        /* Hamburger rotate */
+        .hamburger-icon {
+            transition: transform 300ms ease-in-out;
+        }
+        .hamburger-icon.open {
+            transform: rotate(90deg);
+        }
+
+        /* Accordion */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 300ms ease;
+        }
+        .accordion-content.open {
+            max-height: 500px;
+        }
+        .accordion-icon {
+            transition: transform 300ms ease;
+        }
+        .accordion-icon.open {
+            transform: rotate(180deg);
+        }
+
+        /* Stats text */
+        .stat-number {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Hide class before scroll in */
+        .scroll-animate {
+            opacity: 0;
+        }
+
+        /* Pre-animation initial states (so it doesn't flash) */
+        [data-animation] {
+            opacity: 1;
+        }
+
+        /* Timeline */
+        .timeline-item {
+            position: relative;
+        }
+
+        /* Social icons hover */
+        .social-icon {
+            transition: all 200ms ease-in-out;
+        }
+        .social-icon:hover {
+            transform: scale(1.2);
+            color: #DF6B33 !important;
+        }
+
+        /* Gradient BG for cta section */
+        .cta-bg {
+            background: linear-gradient(180deg, #1A0E08 0%, #090A14 100%);
+        }
+
+        /* Footer BG */
+        .footer-bg {
+            background-color: #050610;
+        }
+
+        /* Smooth transition for all interactive elements */
+        a, button, input {
+            transition: all 300ms ease-in-out;
+        }
+
+        /* Form input */
+        .form-input {
+            background-color: #13141F;
+            border: 1px solid #2a2c3e;
+            color: #ffffff;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #DF6B33;
+        }
+        .form-input::placeholder {
+            color: #6b7280;
+        }
+
+        /* Tech chip */
+        .tech-chip {
+            background-color: rgba(223, 107, 51, 0.15);
+            color: #FBA26A;
+            border: 1px solid rgba(223, 107, 51, 0.3);
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 400ms ease-in-out;
+        }
+        .mobile-menu.open {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============ 1. NAVBAR ============ -->
+    <nav id="navbar" class="navbar fixed top-0 left-0 right-0 z-50 bg-transparent animate__animated animate__fadeInDown">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 lg:h-20">
+                <!-- Logo -->
+                <a href="#" class="text-2xl font-extrabold text-brand tracking-tight">
+                    Claude Code
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="#course" class="text-gray-300 hover:text-white font-medium">Khóa học</a>
+                    <a href="#curriculum" class="text-gray-300 hover:text-white font-medium">Lộ trình</a>
+                    <a href="#testimonials" class="text-gray-300 hover:text-white font-medium">Học viên</a>
+                    <a href="#faq" class="text-gray-300 hover:text-white font-medium">FAQ</a>
+                </div>
+
+                <!-- CTA Desktop -->
+                <div class="hidden lg:block">
+                    <a href="#register" class="btn-primary inline-flex items-center px-6 py-2.5 rounded-lg text-white font-semibold">
+                        Đăng Ký Ngay
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="lg:hidden text-white p-2" aria-label="Menu">
+                    <i data-lucide="menu" id="hamburger" class="hamburger-icon w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="mobile-menu lg:hidden">
+                <div class="py-4 space-y-3 border-t border-gray-800">
+                    <a href="#course" class="block text-gray-300 hover:text-white font-medium py-2">Khóa học</a>
+                    <a href="#curriculum" class="block text-gray-300 hover:text-white font-medium py-2">Lộ trình</a>
+                    <a href="#testimonials" class="block text-gray-300 hover:text-white font-medium py-2">Học viên</a>
+                    <a href="#faq" class="block text-gray-300 hover:text-white font-medium py-2">FAQ</a>
+                    <a href="#register" class="btn-primary block text-center px-6 py-2.5 rounded-lg text-white font-semibold mt-3">
+                        Đăng Ký Ngay
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============ 2. HERO ============ -->
+    <section id="hero" class="pt-28 lg:pt-32 pb-16 lg:pb-24 relative overflow-hidden">
+        <!-- Subtle background glow -->
+        <div class="absolute top-20 right-0 w-96 h-96 bg-brand opacity-10 blur-3xl rounded-full"></div>
+        <div class="absolute bottom-0 left-0 w-72 h-72 bg-brand-light opacity-5 blur-3xl rounded-full"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="grid lg:grid-cols-5 gap-12 items-center">
+                <!-- Left: Text (60%) -->
+                <div class="lg:col-span-3" data-animation="animate__fadeInLeft">
+                    <!-- Badge -->
+                    <div class="inline-flex items-center px-4 py-2 rounded-full bg-orange-500/10 border border-brand/30 text-brand font-semibold text-sm mb-6">
+                        🔥 Khai giảng tháng 6/2026
+                    </div>
+
+                    <!-- Title -->
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+                        Xây dựng ứng dụng với <span class="gradient-text">Claude Code</span>
+                    </h1>
+
+                    <!-- Description -->
+                    <p class="text-lg lg:text-xl text-gray-400 mb-8 max-w-2xl leading-relaxed">
+                        Khóa học <strong class="text-white">8 buổi (16 tiết)</strong> trang bị kỹ năng thực chiến — từ cài đặt đến triển khai sản phẩm hoàn chỉnh lên Vercel
+                    </p>
+
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                        <a href="#register" class="btn-primary inline-flex items-center justify-center px-7 py-3.5 rounded-lg text-white font-semibold">
+                            Đăng Ký Khóa Học
+                            <i data-lucide="arrow-right" class="ml-2 w-5 h-5"></i>
+                        </a>
+                        <a href="#curriculum" class="btn-outline inline-flex items-center justify-center px-7 py-3.5 rounded-lg text-white font-semibold">
+                            <i data-lucide="play" class="mr-2 w-5 h-5"></i>
+                            Xem Demo
+                        </a>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="flex items-center gap-4 flex-wrap">
+                        <span class="text-gray-500 line-through text-xl">5.000.000đ</span>
+                        <span class="text-3xl font-extrabold text-white">3.500.000đ</span>
+                        <span class="bg-red-500 text-white px-3 py-1 rounded-md text-sm font-bold">Giảm 30%</span>
+                    </div>
+                </div>
+
+                <!-- Right: Image (40%) -->
+                <div class="lg:col-span-2" data-animation="animate__fadeInRight">
+                    <div class="hero-glow rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80" alt="Lập trình viên coding" class="w-full h-80 lg:h-96 object-cover">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats row -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-16 lg:mt-20">
+                <div class="bg-bg-card border border-gray-800 rounded-xl p-6 text-center" data-animation="animate__fadeInUp">
+                    <div class="stat-number text-4xl lg:text-5xl font-extrabold text-brand mb-2" data-target="16">0</div>
+                    <div class="text-gray-400 font-medium">tiết học</div>
+                </div>
+                <div class="bg-bg-card border border-gray-800 rounded-xl p-6 text-center" data-animation="animate__fadeInUp">
+                    <div class="stat-number text-4xl lg:text-5xl font-extrabold text-brand mb-2" data-target="8">0</div>
+                    <div class="text-gray-400 font-medium">buổi thực chiến</div>
+                </div>
+                <div class="bg-bg-card border border-gray-800 rounded-xl p-6 text-center" data-animation="animate__fadeInUp">
+                    <div class="stat-number text-4xl lg:text-5xl font-extrabold text-brand mb-2" data-target="100">0</div>
+                    <div class="text-gray-400 font-medium">% Deploy thực tế</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 3. PROBLEMS ============ -->
+    <section id="problems" class="py-16 lg:py-24 bg-bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 lg:mb-16">
+                <h2 class="text-3xl lg:text-5xl font-extrabold text-white mb-4" data-animation="animate__fadeInUp">Bạn đang gặp những vấn đề nào?</h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto" data-animation="animate__fadeInUp">Những điều khiến bạn chậm tiến — Claude Code sẽ giúp bạn giải quyết</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                <!-- Card 1 -->
+                <div class="bg-bg-card border border-gray-800 rounded-2xl p-8 card-hover" data-animation="animate__fadeInUp">
+                    <div class="text-5xl mb-4">⏱️</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Viết code mất quá nhiều thời gian</h3>
+                    <p class="text-gray-400">Mất hàng giờ cho một đoạn logic, deadline cứ dí sát. Bạn cần một trợ lý giúp tăng tốc.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-bg-card border border-gray-800 rounded-2xl p-8 card-hover" data-animation="animate__fadeInUp">
+                    <div class="text-5xl mb-4">🧩</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Khó ghi nhớ cú pháp và thư viện</h3>
+                    <p class="text-gray-400">Frameworks thay đổi liên tục, cú pháp mới mỗi ngày. Đầu óc không thể nhớ hết được.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-bg-card border border-gray-800 rounded-2xl p-8 card-hover" data-animation="animate__fadeInUp">
+                    <div class="text-5xl mb-4">😰</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Sợ làm hỏng code khi chỉnh sửa</h3>
+                    <p class="text-gray-400">Mỗi lần refactor đều lo bug xuất hiện. Thiếu sự tự tin để đi sâu vào dự án.</p>
+                </div>
+                <!-- Card 4 -->
+                <div class="bg-bg-card border border-gray-800 rounded-2xl p-8 card-hover" data-animation="animate__fadeInUp">
+                    <div class="text-5xl mb-4">🔄</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Muốn tự động hóa nhưng không biết bắt đầu</h3>
+                    <p class="text-gray-400">Biết AI là tương lai nhưng không biết bắt đầu từ đâu, học thế nào cho hiệu quả.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 4. SOLUTIONS ============ -->
+    <section id="solutions" class="py-16 lg:py-24 bg-bg-card">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 lg:mb-16">
+                <h2 class="text-3xl lg:text-5xl font-extrabold text-white mb-4" data-animation="animate__fadeInUp">Giải Pháp Toàn Diện Cho Bạn</h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto" data-animation="animate__fadeInUp">Khóa học cung cấp đầy đủ kiến thức, công cụ và cộng đồng để bạn thành công</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                <!-- Item 1 -->
+                <div class="bg-bg-dark border border-gray-800 rounded-2xl p-8 text-center card-hover" data-animation="animate__zoomIn">
+                    <div class="text-5xl mb-4">📖</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Hướng dẫn từng bước chi tiết</h3>
+                    <p class="text-gray-400">8 buổi thực chiến, đi từ zero đến production</p>
+                </div>
+                <!-- Item 2 -->
+                <div class="bg-bg-dark border border-gray-800 rounded-2xl p-8 text-center card-hover" data-animation="animate__zoomIn">
+                    <div class="text-5xl mb-4">💻</div>
+                    <h3 class="text-xl font-bold text-white mb-2">16 tiết thực hành</h3>
+                    <p class="text-gray-400">Bài tập thực tế, áp dụng ngay vào dự án</p>
+                </div>
+                <!-- Item 3 -->
+                <div class="bg-bg-dark border border-gray-800 rounded-2xl p-8 text-center card-hover" data-animation="animate__zoomIn">
+                    <div class="text-5xl mb-4">🚀</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Học qua dự án thực tế</h3>
+                    <p class="text-gray-400">ProjectOS - ứng dụng production-grade</p>
+                </div>
+                <!-- Item 4 (start of centered row on lg) -->
+                <div class="hidden lg:block lg:col-span-3">
+                    <div class="grid lg:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                        <div class="bg-bg-dark border border-gray-800 rounded-2xl p-8 text-center card-hover" data-animation="animate__zoomIn">
+                            <div class="text-5xl mb-4">🎬</div>
+                            <h3 class="text-xl font-bold text-white mb-2">Video ghi lại toàn bộ buổi học</h3>
+                            <p class="text-gray-400">Xem lại bất cứ lúc nào, truy cập vĩnh viễn</p>
+                        </div>
+                        <div class="bg-bg-dark border border-gray-800 rounded-2xl p-8 text-center card-hover" data-animation="animate__zoomIn">
+                            <div class="text-5xl mb-4">👥</div>
+                            <h3 class="text-xl font-bold text-white mb-2">Cộng đồng học viên & Group Zalo</h3>
+                            <p class="text-gray-400">Hỗ trợ 3 tháng sau khóa học</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Item 4 (mobile fallback, shown when 2-col grid) -->
+                <div class="lg:hidden bg-bg-dark border border-gray-800 rounded-2xl p-8 text-center card-hover" data-animation="animate__zoomIn">
+                    <div class="text-5xl mb-4">🎬</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Video ghi lại toàn bộ buổi học</h3>
+                    <p class="text-gray-400">Xem lại bất cứ lúc nào, truy cập vĩnh viễn</p>
+                </div>
+                <div class="lg:hidden bg-bg-dark border border-gray-800 rounded-2xl p-8 text-center card-hover" data-animation="animate__zoomIn">
+                    <div class="text-5xl mb-4">👥</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Cộng đồng học viên & Group Zalo</h3>
+                    <p class="text-gray-400">Hỗ trợ 3 tháng sau khóa học</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 5. AUDIENCE ============ -->
+    <section id="audience" class="py-16 lg:py-24 bg-bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 lg:mb-16">
+                <h2 class="text-3xl lg:text-5xl font-extrabold text-white mb-4" data-animation="animate__fadeInUp">Khóa Học Dành Cho Ai?</h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto" data-animation="animate__fadeInUp">Bất kể bạn đang ở đâu — đây là bước nhảy vọt cho sự nghiệp</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                <!-- Card 1 -->
+                <div class="bg-bg-card border border-gray-800 rounded-2xl p-6 card-hover" data-animation="animate__fadeInUp">
+                    <div class="flex items-start gap-4">
+                        <img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=64&h=64&q=80" alt="Sinh viên" class="w-16 h-16 rounded-full object-cover flex-shrink-0">
+                        <div>
+                            <div class="text-3xl mb-2">🎓</div>
+                            <h3 class="text-lg font-bold text-white mb-2">Sinh viên năm 3-4 & mới ra trường</h3>
+                            <p class="text-gray-400">Lương khởi điểm 10-15 triệu/tháng</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-bg-card border border-gray-800 rounded-2xl p-6 card-hover" data-animation="animate__fadeInUp">
+                    <div class="flex items-start gap-4">
+                        <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=64&h=64&q=80" alt="Người đi làm" class="w-16 h-16 rounded-full object-cover flex-shrink-0">
+                        <div>
+                            <div class="text-3xl mb-2">💼</div>
+                            <h3 class="text-lg font-bold text-white mb-2">Người đi làm muốn nâng cấp</h3>
+                            <p class="text-gray-400">Fresher, IT Support, Tester</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-bg-card border border-gray-800 rounded-2xl p-6 card-hover" data-animation="animate__fadeInUp">
+                    <div class="flex items-start gap-4">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=64&h=64&q=80" alt="Non-tech" class="w-16 h-16 rounded-full object-cover flex-shrink-0">
+                        <div>
+                            <div class="text-3xl mb-2">🛠️</div>
+                            <h3 class="text-lg font-bold text-white mb-2">Non-tech muốn tự xây sản phẩm</h3>
+                            <p class="text-gray-400">PM, Designer, Entrepreneur</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 4 -->
+                <div class="bg-bg-card border border-gray-800 rounded-2xl p-6 card-hover" data-animation="animate__fadeInUp">
+                    <div class="flex items-start gap-4">
+                        <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=64&h=64&q=80" alt="Developer" class="w-16 h-16 rounded-full object-cover flex-shrink-0">
+                        <div>
+                            <div class="text-3xl mb-2">⚡</div>
+                            <h3 class="text-lg font-bold text-white mb-2">Developer muốn làm AI-native</h3>
+                            <p class="text-gray-400">Đã có nền tảng, muốn bứt phá</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 6. CURRICULUM ============ -->
+    <section id="curriculum" class="py-16 lg:py-24 bg-bg-card">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 lg:mb-16">
+                <h2 class="text-3xl lg:text-5xl font-extrabold text-white mb-4" data-animation="animate__fadeInUp">Chương Trình 8 Buổi</h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto" data-animation="animate__fadeInUp">Lộ trình rõ ràng, từ cơ bản đến triển khai production</p>
+            </div>
+
+            <div class="max-w-3xl mx-auto relative">
+                <!-- Vertical line -->
+                <div class="absolute left-6 lg:left-8 top-0 bottom-0 w-0.5 border-l-2 border-dashed border-brand/50"></div>
+
+                <!-- Item 1 -->
+                <div class="relative pl-20 lg:pl-24 pb-10" data-animation="animate__fadeInLeft">
+                    <div class="absolute left-0 top-0 w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-brand flex items-center justify-center text-white font-extrabold text-lg lg:text-xl shadow-lg shadow-brand/30">1</div>
+                    <div class="bg-bg-dark border border-gray-800 rounded-xl p-6 card-hover">
+                        <h3 class="text-xl font-bold text-white mb-2">Làm quen Claude Code</h3>
+                        <p class="text-gray-400">Cài đặt, cấu hình & luồng làm việc cơ bản</p>
+                    </div>
+                </div>
+                <!-- Item 2 -->
+                <div class="relative pl-20 lg:pl-24 pb-10" data-animation="animate__fadeInLeft">
+                    <div class="absolute left-0 top-0 w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-brand flex items-center justify-center text-white font-extrabold text-lg lg:text-xl shadow-lg shadow-brand/30">2</div>
+                    <div class="bg-bg-dark border border-gray-800 rounded-xl p-6 card-hover">
+                        <h3 class="text-xl font-bold text-white mb-2">Prompt Engineering thực chiến</h3>
+                        <p class="text-gray-400">Cách "nói chuyện" với AI để có kết quả tốt nhất</p>
+                    </div>
+                </div>
+                <!-- Item 3 -->
+                <div class="relative pl-20 lg:pl-24 pb-10" data-animation="animate__fadeInLeft">
+                    <div class="absolute left-0 top-0 w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-brand flex items-center justify-center text-white font-extrabold text-lg lg:text-xl shadow-lg shadow-brand/30">3</div>
+                    <div class="bg-bg-dark border border-gray-800 rounded-xl p-6 card-hover">
+                        <h3 class="text-xl font-bold text-white mb-2">Thiết kế kiến trúc ứng dụng cùng AI</h3>
+                        <p class="text-gray-400">Phân tích yêu cầu, lên cấu trúc dự án & database</p>
+                    </div>
+                </div>
+                <!-- Item 4 -->
+                <div class="relative pl-20 lg:pl-24 pb-10" data-animation="animate__fadeInLeft">
+                    <div class="absolute left-0 top-0 w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-brand flex items-center justify-center text-white font-extrabold text-lg lg:text-xl shadow-lg shadow-brand/30">4</div>
+                    <div class="bg-bg-dark border border-gray-800 rounded-xl p-6 card-hover">
+                        <h3 class="text-xl font-bold text-white mb-2">Xây dựng Backend với Firebase</h3>
+                        <p class="text-gray-400">Auth, Firestore, Cloud Functions cơ bản</p>
+                    </div>
+                </div>
+                <!-- Item 5 -->
+                <div class="relative pl-20 lg:pl-24 pb-10" data-animation="animate__fadeInLeft">
+                    <div class="absolute left-0 top-0 w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-brand flex items-center justify-center text-white font-extrabold text-lg lg:text-xl shadow-lg shadow-brand/30">5</div>
+                    <div class="bg-bg-dark border border-gray-800 rounded-xl p-6 card-hover">
+                        <h3 class="text-xl font-bold text-white mb-2">Xây dựng Frontend</h3>
+                        <p class="text-gray-400">UI, kết nối Firebase, xử lý nghiệp vụ</p>
+                    </div>
+                </div>
+                <!-- Item 6 -->
+                <div class="relative pl-20 lg:pl-24 pb-10" data-animation="animate__fadeInLeft">
+                    <div class="absolute left-0 top-0 w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-brand flex items-center justify-center text-white font-extrabold text-lg lg:text-xl shadow-lg shadow-brand/30">6</div>
+                    <div class="bg-bg-dark border border-gray-800 rounded-xl p-6 card-hover">
+                        <h3 class="text-xl font-bold text-white mb-2">Debug & Refactor cùng AI</h3>
+                        <p class="text-gray-400">Tìm và sửa lỗi, cải thiện chất lượng code</p>
+                    </div>
+                </div>
+                <!-- Item 7 -->
+                <div class="relative pl-20 lg:pl-24 pb-10" data-animation="animate__fadeInLeft">
+                    <div class="absolute left-0 top-0 w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-brand flex items-center justify-center text-white font-extrabold text-lg lg:text-xl shadow-lg shadow-brand/30">7</div>
+                    <div class="bg-bg-dark border border-gray-800 rounded-xl p-6 card-hover">
+                        <h3 class="text-xl font-bold text-white mb-2">Tích hợp tính năng nâng cao</h3>
+                        <p class="text-gray-400">Realtime, notification, file upload, payments</p>
+                    </div>
+                </div>
+                <!-- Item 8 -->
+                <div class="relative pl-20 lg:pl-24 pb-0" data-animation="animate__fadeInLeft">
+                    <div class="absolute left-0 top-0 w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-brand flex items-center justify-center text-white font-extrabold text-lg lg:text-xl shadow-lg shadow-brand/30">8</div>
+                    <div class="bg-bg-dark border border-gray-800 rounded-xl p-6 card-hover">
+                        <h3 class="text-xl font-bold text-white mb-2">Deploy & Hoàn thiện sản phẩm trên Vercel</h3>
+                        <p class="text-gray-400">Đưa ứng dụng lên cloud, CI/CD, monitoring cơ bản</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 7. PRODUCTS ============ -->
+    <section id="products" class="py-16 lg:py-24 bg-bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 lg:mb-16">
+                <h2 class="text-3xl lg:text-5xl font-extrabold text-white mb-4" data-animation="animate__fadeInUp">Sản Phẩm Học Viên</h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto" data-animation="animate__fadeInUp">Từ zero đến production — kết quả thực tế của học viên</p>
+            </div>
+
+            <!-- Featured product card -->
+            <div class="max-w-4xl mx-auto bg-bg-card border border-gray-800 rounded-2xl overflow-hidden card-hover" data-animation="animate__zoomIn">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80" alt="ProjectOS dashboard" class="w-full h-64 lg:h-72 object-cover">
+                <div class="p-8">
+                    <h3 class="text-2xl lg:text-3xl font-bold text-white mb-2">ProjectOS — Enterprise Project Management</h3>
+                    <a href="https://project-management.vercel.app" target="_blank" rel="noopener" class="text-brand hover:text-brand-light font-medium inline-flex items-center">
+                        project-management.vercel.app
+                        <i data-lucide="external-link" class="ml-2 w-4 h-4"></i>
+                    </a>
+                    <p class="text-gray-400 mt-4 leading-relaxed">Hệ thống quản lý dự án doanh nghiệp, xây dựng hoàn toàn với Claude Code trong 8 buổi học</p>
+                    <div class="flex flex-wrap gap-2 mt-6">
+                        <span class="tech-chip px-3 py-1 rounded-full text-sm font-medium">Firebase</span>
+                        <span class="tech-chip px-3 py-1 rounded-full text-sm font-medium">Next.js</span>
+                        <span class="tech-chip px-3 py-1 rounded-full text-sm font-medium">Vercel</span>
+                        <span class="tech-chip px-3 py-1 rounded-full text-sm font-medium">Tailwind</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote -->
+            <div class="max-w-4xl mx-auto mt-12 text-center" data-animation="animate__fadeIn">
+                <blockquote class="text-2xl lg:text-3xl font-semibold text-white leading-relaxed">
+                    "Lập trình viên tương lai không phải người viết code nhanh nhất.<br>
+                    Họ là người biết <span class="gradient-text">hướng dẫn AI</span> tốt nhất."
+                </blockquote>
+            </div>
+
+            <!-- 2 stats counter -->
+            <div class="grid grid-cols-2 gap-6 max-w-2xl mx-auto mt-12">
+                <div class="text-center" data-animation="animate__fadeInUp">
+                    <div class="stat-number text-4xl lg:text-5xl font-extrabold gradient-text mb-2" data-target="100">0%</div>
+                    <div class="text-gray-400">hoàn thành project</div>
+                </div>
+                <div class="text-center" data-animation="animate__fadeInUp">
+                    <div class="stat-number text-4xl lg:text-5xl font-extrabold gradient-text mb-2" data-target="8">0</div>
+                    <div class="text-gray-400">buổi từ zero đến production</div>
+                </div>
+            </div>
+
+            <!-- Testimonials -->
+            <div class="grid md:grid-cols-3 gap-6 mt-12 max-w-6xl mx-auto">
+                <!-- Testimonial 1 -->
+                <div class="bg-bg-card border border-gray-800 rounded-xl p-6 card-hover" data-animation="animate__fadeInUp">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&h=60&q=80" alt="Avatar" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <div class="text-white font-semibold">Nguyễn Minh Anh</div>
+                            <div class="text-yellow-400 text-sm">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm">"Khóa học thay đổi hoàn toàn cách tôi làm việc. Trước đây 1 dự án mất 2 tuần, giờ chỉ còn 3 ngày."</p>
+                </div>
+                <!-- Testimonial 2 -->
+                <div class="bg-bg-card border border-gray-800 rounded-xl p-6 card-hover" data-animation="animate__fadeInUp">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=60&h=60&q=80" alt="Avatar" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <div class="text-white font-semibold">Trần Quốc Đạt</div>
+                            <div class="text-yellow-400 text-sm">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm">"Từ một tester, tôi đã tự xây được sản phẩm deploy lên Vercel. Cảm ơn team rất nhiều!"</p>
+                </div>
+                <!-- Testimonial 3 -->
+                <div class="bg-bg-card border border-gray-800 rounded-xl p-6 card-hover" data-animation="animate__fadeInUp">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&q=80" alt="Avatar" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <div class="text-white font-semibold">Lê Thị Hương</div>
+                            <div class="text-yellow-400 text-sm">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm">"Cách giảng dạy rõ ràng, dự án thực tế. Mình recommend cho bạn bè đồng nghiệp đều thấy ổn."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 8. REGISTER ============ -->
+    <section id="register" class="py-16 lg:py-24 cta-bg">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl lg:text-5xl font-extrabold text-white mb-4" data-animation="animate__fadeInUp">Sẵn Sàng Bắt Đầu Chưa?</h2>
+                <p class="text-gray-400 text-lg" data-animation="animate__fadeInUp">Đăng ký ngay để giữ chỗ trong lớp khai giảng tháng 6/2026</p>
+            </div>
+
+            <!-- Form -->
+            <form id="registerForm" class="max-w-md mx-auto bg-bg-card border border-gray-800 rounded-2xl p-8" data-animation="animate__fadeInUp" novalidate>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Họ và tên <span class="text-brand">*</span></label>
+                        <input type="text" name="name" required placeholder="Nguyễn Văn A" class="form-input w-full px-4 py-3 rounded-lg">
+                        <p class="text-red-400 text-xs mt-1 hidden" data-error="name">Vui lòng nhập họ và tên</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Email <span class="text-brand">*</span></label>
+                        <input type="email" name="email" required placeholder="you@example.com" class="form-input w-full px-4 py-3 rounded-lg">
+                        <p class="text-red-400 text-xs mt-1 hidden" data-error="email">Vui lòng nhập email đúng định dạng</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Số điện thoại</label>
+                        <input type="tel" name="phone" placeholder="09xx xxx xxx" class="form-input w-full px-4 py-3 rounded-lg">
+                    </div>
+                    <button type="submit" id="submitBtn" class="w-full btn-primary text-white font-semibold py-3.5 rounded-lg animate__animated animate__pulse animate__infinite animate__slow">
+                        Đăng Ký Ngay
+                    </button>
+                </div>
+
+                <!-- Success message -->
+                <div id="successMsg" class="hidden mt-4 p-4 bg-green-500/10 border border-green-500/30 text-green-300 rounded-lg text-center">
+                    ✓ Đăng ký thành công! Chúng tôi sẽ liên hệ trong 24h.
+                </div>
+            </form>
+
+            <!-- Support -->
+            <div class="text-center mt-8" data-animation="animate__fadeInUp">
+                <a href="tel:02363779779" class="btn-outline inline-flex items-center px-6 py-3 rounded-lg text-white font-semibold">
+                    <i data-lucide="phone" class="mr-2 w-5 h-5"></i>
+                    Liên Hệ Hỗ Trợ
+                </a>
+                <div class="mt-6 text-gray-400">
+                    Hotline: 📞 <a href="tel:02363779779" class="text-brand hover:text-brand-light font-semibold">0236.3.779.779</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 9. FAQ ============ -->
+    <section id="faq" class="py-16 lg:py-24 bg-bg-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 lg:mb-16">
+                <h2 class="text-3xl lg:text-5xl font-extrabold text-white mb-4" data-animation="animate__fadeInUp">Câu Hỏi Thường Gặp</h2>
+                <p class="text-gray-400 text-lg" data-animation="animate__fadeInUp">Giải đáp những thắc mắc phổ biến nhất</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Item 1 -->
+                <div class="bg-bg-card border border-gray-800 rounded-xl overflow-hidden" data-animation="animate__fadeInUp">
+                    <button class="accordion-btn w-full flex items-center justify-between p-6 text-left">
+                        <span class="text-white font-semibold pr-4">Tôi là người mới bắt đầu, có học được không?</span>
+                        <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-brand flex-shrink-0"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="px-6 pb-6 text-gray-400">Hoàn toàn được! Buổi 1-2 trang bị nền tảng từ đầu. Chỉ cần biết dùng máy tính cơ bản.</div>
+                    </div>
+                </div>
+                <!-- Item 2 -->
+                <div class="bg-bg-card border border-gray-800 rounded-xl overflow-hidden" data-animation="animate__fadeInUp">
+                    <button class="accordion-btn w-full flex items-center justify-between p-6 text-left">
+                        <span class="text-white font-semibold pr-4">Khóa này dành cho những ai?</span>
+                        <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-brand flex-shrink-0"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="px-6 pb-6 text-gray-400">Sinh viên IT, Fresher, PM/Designer/Entrepreneur muốn tự xây sản phẩm, Developer muốn làm AI-native.</div>
+                    </div>
+                </div>
+                <!-- Item 3 -->
+                <div class="bg-bg-card border border-gray-800 rounded-xl overflow-hidden" data-animation="animate__fadeInUp">
+                    <button class="accordion-btn w-full flex items-center justify-between p-6 text-left">
+                        <span class="text-white font-semibold pr-4">Tôi mất bao lâu để hoàn thành?</span>
+                        <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-brand flex-shrink-0"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="px-6 pb-6 text-gray-400">4 tuần, 8 buổi, mỗi buổi 2 tiết. Sau khóa có sản phẩm hoàn chỉnh deploy lên Vercel.</div>
+                    </div>
+                </div>
+                <!-- Item 4 -->
+                <div class="bg-bg-card border border-gray-800 rounded-xl overflow-hidden" data-animation="animate__fadeInUp">
+                    <button class="accordion-btn w-full flex items-center justify-between p-6 text-left">
+                        <span class="text-white font-semibold pr-4">Có hỗ trợ sau khi học không?</span>
+                        <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-brand flex-shrink-0"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="px-6 pb-6 text-gray-400">Group Zalo hỗ trợ 3 tháng + video bài giảng truy cập vĩnh viễn.</div>
+                    </div>
+                </div>
+                <!-- Item 5 -->
+                <div class="bg-bg-card border border-gray-800 rounded-xl overflow-hidden" data-animation="animate__fadeInUp">
+                    <button class="accordion-btn w-full flex items-center justify-between p-6 text-left">
+                        <span class="text-white font-semibold pr-4">Nếu không hài lòng thì sao?</span>
+                        <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-brand flex-shrink-0"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="px-6 pb-6 text-gray-400">Hoàn 100% học phí nếu không hài lòng sau buổi đầu tiên, báo trong 24h.</div>
+                    </div>
+                </div>
+                <!-- Item 6 -->
+                <div class="bg-bg-card border border-gray-800 rounded-xl overflow-hidden" data-animation="animate__fadeInUp">
+                    <button class="accordion-btn w-full flex items-center justify-between p-6 text-left">
+                        <span class="text-white font-semibold pr-4">Tôi có truy cập vĩnh viễn không?</span>
+                        <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-brand flex-shrink-0"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="px-6 pb-6 text-gray-400">Có. Video + tài liệu + source code đều tải về được, không hết hạn.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 10. FOOTER ============ -->
+    <footer class="footer-bg py-16 lg:py-20 border-t border-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+                <!-- Brand -->
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=48&h=48&q=80" alt="Logo" class="w-10 h-10 rounded-lg object-cover">
+                        <span class="text-2xl font-extrabold text-brand">Claude Code</span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">Khóa học AI-native development tại Softech Aptech Đà Nẵng.</p>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Liên hệ</h4>
+                    <ul class="space-y-3 text-gray-400 text-sm">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-brand mt-0.5 flex-shrink-0"></i>
+                            <span>24 Lê Thánh Tôn, Đà Nẵng</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="phone" class="w-4 h-4 text-brand mt-0.5 flex-shrink-0"></i>
+                            <a href="tel:02363779779" class="hover:text-white">0236.3.779.779</a>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="mail" class="w-4 h-4 text-brand mt-0.5 flex-shrink-0"></i>
+                            <a href="mailto:info@softech.vn" class="hover:text-white">info@softech.vn</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Social -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Mạng xã hội</h4>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-10 h-10 rounded-lg bg-bg-card border border-gray-800 flex items-center justify-center text-gray-400 social-icon">
+                            <i data-lucide="facebook" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-lg bg-bg-card border border-gray-800 flex items-center justify-center text-gray-400 social-icon">
+                            <i data-lucide="message-circle" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-lg bg-bg-card border border-gray-800 flex items-center justify-center text-gray-400 social-icon">
+                            <i data-lucide="linkedin" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-lg bg-bg-card border border-gray-800 flex items-center justify-center text-gray-400 social-icon">
+                            <i data-lucide="youtube" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Bản tin</h4>
+                    <p class="text-gray-400 text-sm mb-4">Nhận tips Claude Code miễn phí</p>
+                    <form id="newsletterForm" class="space-y-2">
+                        <input type="email" required placeholder="Email của bạn" class="form-input w-full px-4 py-2.5 rounded-lg text-sm">
+                        <button type="submit" class="w-full btn-primary text-white font-semibold py-2.5 rounded-lg text-sm">
+                            Đăng ký
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-900 mt-12 pt-8 text-center text-gray-500 text-sm">
+                © 2026 Softech Aptech Đà Nẵng. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- =========================================
+         SCRIPTS
+    ========================================= -->
+    <script>
+        // Init Lucide icons
+        lucide.createIcons();
+
+        // ====== Navbar scroll effect ======
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // ====== Mobile menu toggle ======
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const hamburger = document.getElementById('hamburger');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('open');
+            hamburger.classList.toggle('open');
+        });
+
+        // Close mobile menu when clicking a link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+                hamburger.classList.remove('open');
+            });
+        });
+
+        // ====== Smooth scroll for anchor links ======
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href === '#' || href.length < 2) return;
+                const target = document.querySelector(href);
+                if (target) {
+                    e.preventDefault();
+                    const offsetTop = target.offsetTop - 70;
+                    window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+                }
+            });
+        });
+
+        // ====== Intersection Observer for animations + counter ======
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        // Group stagger: each [data-animation] in a group gets increasing delay
+        const animatedEls = document.querySelectorAll('[data-animation]');
+        const animatedSet = new Set(animatedEls);
+
+        // Build parent-child map for staggered groups
+        const groupMap = new Map();
+        animatedEls.forEach(el => {
+            const parent = el.parentElement;
+            if (!groupMap.has(parent)) groupMap.set(parent, []);
+            groupMap.get(parent).push(el);
+        });
+
+        groupMap.forEach((siblings) => {
+            siblings.forEach((el, idx) => {
+                // delay per item: 100ms stagger
+                el.style.animationDelay = `${idx * 100}ms`;
+            });
+        });
+
+        // Special stagger: curriculum timeline 150ms
+        document.querySelectorAll('#curriculum .timeline-item, #curriculum [data-animation]').forEach((el, i) => {
+            el.style.animationDelay = `${i * 150}ms`;
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const anim = el.getAttribute('data-animation');
+                    if (anim && !el.classList.contains('animate__animated')) {
+                        el.classList.add('animate__animated', anim);
+                        // Trigger counter for .stat-number
+                        if (el.classList.contains('stat-number') && el.hasAttribute('data-target')) {
+                            runCounter(el);
+                        }
+                        observer.unobserve(el);
+                    }
+                }
+            });
+        }, observerOptions);
+
+        animatedEls.forEach(el => observer.observe(el));
+
+        // Also observe stat numbers specifically
+        document.querySelectorAll('.stat-number[data-target]').forEach(el => observer.observe(el));
+
+        // ====== Counter animation ======
+        function runCounter(el) {
+            const target = parseInt(el.getAttribute('data-target'), 10);
+            const duration = 1500;
+            const start = performance.now();
+            const isPercent = el.textContent.includes('%');
+
+            const tick = (now) => {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                // easeOutCubic
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(eased * target);
+                el.textContent = current + (isPercent && target === 100 ? '%' : '');
+                if (progress < 1) requestAnimationFrame(tick);
+                else el.textContent = target + (isPercent && target === 100 ? '%' : '');
+            };
+            requestAnimationFrame(tick);
+        }
+
+        // ====== FAQ Accordion ======
+        document.querySelectorAll('.accordion-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const content = btn.nextElementSibling;
+                const icon = btn.querySelector('.accordion-icon');
+                const isOpen = content.classList.contains('open');
+
+                // Close all
+                document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('open'));
+                document.querySelectorAll('.accordion-icon').forEach(i => i.classList.remove('open'));
+
+                // Open the clicked one if it was closed
+                if (!isOpen) {
+                    content.classList.add('open');
+                    icon.classList.add('open');
+                }
+            });
+        });
+
+        // ====== Register form validation ======
+        const registerForm = document.getElementById('registerForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMsg = document.getElementById('successMsg');
+
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let valid = true;
+            const name = registerForm.querySelector('[name="name"]');
+            const email = registerForm.querySelector('[name="email"]');
+
+            // Reset
+            registerForm.querySelectorAll('[data-error]').forEach(p => p.classList.add('hidden'));
+
+            if (!name.value.trim()) {
+                registerForm.querySelector('[data-error="name"]').classList.remove('hidden');
+                valid = false;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email.value.trim())) {
+                registerForm.querySelector('[data-error="email"]').classList.remove('hidden');
+                valid = false;
+            }
+
+            if (valid) {
+                successMsg.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.textContent = '✓ Đã đăng ký';
+                submitBtn.classList.remove('animate__animated', 'animate__pulse', 'animate__infinite', 'animate__slow');
+                registerForm.reset();
+            }
+        });
+
+        // ====== Newsletter form ======
+        const newsletterForm = document.getElementById('newsletterForm');
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const input = newsletterForm.querySelector('input[type="email"]');
+                if (input.value.trim()) {
+                    alert('Cảm ơn bạn đã đăng ký nhận tin!');
+                    input.value = '';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
