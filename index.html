@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code - Xây dựng ứng dụng hoàn chỉnh</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#090A14',
+                        card: '#13141F',
+                        primary: '#DF6B33',
+                        primaryLight: '#FBA26A',
+                        footer: '#050610'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 40px rgba(223, 107, 51, 0.3)',
+                        'glow-sm': '0 0 20px rgba(223, 107, 51, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #090A14;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        /* Initial state for elements to be animated via Intersection Observer */
+        .observe-anim {
+            opacity: 0;
+        }
+        
+        /* Ensure animate.css classes restore opacity */
+        .animate__animated {
+            opacity: 1 !important;
+        }
+
+        /* Pulse Delay */
+        .pulse-delay {
+            animation: pulse 2s infinite;
+            animation-delay: 3s;
+        }
+
+        /* Accordion transition */
+        .accordion-content {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, padding 0.3s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .accordion-content.open {
+            max-height: 300px;
+            opacity: 1;
+        }
+        
+        /* Custom timeline border */
+        .timeline-border {
+            border-left: 2px dashed #DF6B33;
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(to right, #DF6B33, #FBA26A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="antialiased font-sans selection:bg-primary selection:text-white">
+
+    <!-- 1. Thanh điều hướng -->
+    <nav id="navbar" class="fixed w-full z-50 top-0 transition-all duration-300 ease-in-out bg-transparent py-4 animate__animated animate__fadeInDown">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="text-2xl font-bold text-primary tracking-tight">Claude Code</a>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#khoa-hoc" class="text-gray-300 hover:text-white transition-all duration-300 ease-in-out font-medium">Khóa học</a>
+                    <a href="#lo-trinh" class="text-gray-300 hover:text-white transition-all duration-300 ease-in-out font-medium">Lộ trình</a>
+                    <a href="#hoc-vien" class="text-gray-300 hover:text-white transition-all duration-300 ease-in-out font-medium">Học viên</a>
+                    <a href="#faq" class="text-gray-300 hover:text-white transition-all duration-300 ease-in-out font-medium">FAQ</a>
+                    <a href="#dang-ky" class="bg-primary hover:bg-[#c95b28] text-white px-6 py-2.5 rounded-full font-semibold transition-all duration-300 ease-in-out hover:scale-105 shadow-lg shadow-primary/30">
+                        Đăng Ký Ngay
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white focus:outline-none transition-transform duration-300">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-dark/95 backdrop-blur-md border-t border-gray-800 absolute w-full left-0 top-full shadow-xl">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="#khoa-hoc" class="mobile-link block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md">Khóa học</a>
+                <a href="#lo-trinh" class="mobile-link block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md">Lộ trình</a>
+                <a href="#hoc-vien" class="mobile-link block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md">Học viên</a>
+                <a href="#faq" class="mobile-link block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md">FAQ</a>
+                <a href="#dang-ky" class="mobile-link block mt-4 text-center bg-primary hover:bg-[#c95b28] text-white px-6 py-3 rounded-full font-semibold transition-all duration-300">
+                    Đăng Ký Ngay
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <!-- Background decorative elements -->
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] -z-10"></div>
+        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-primaryLight/10 rounded-full blur-[100px] -z-10"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-8">
+                
+                <!-- Left Content -->
+                <div class="w-full lg:w-[60%] observe-anim" data-animation="animate__fadeInLeft">
+                    <div class="inline-flex items-center space-x-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-6">
+                        <span class="text-primary font-semibold text-sm">🔥 Khai giảng tháng 6/2026</span>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                        Xây dựng ứng dụng với <br/>
+                        <span class="text-gradient">Claude Code</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-400 mb-8 max-w-2xl leading-relaxed">
+                        Khóa học 8 buổi (16 tiết) trang bị kỹ năng thực chiến — từ cài đặt đến triển khai sản phẩm hoàn chỉnh lên Vercel.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row items-center gap-4 mb-8">
+                        <a href="#dang-ky" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary hover:bg-[#c95b28] text-white px-8 py-3.5 rounded-full font-semibold transition-all duration-300 ease-in-out hover:scale-105 shadow-glow-sm">
+                            Đăng Ký Khóa Học
+                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#showcase" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-transparent border border-gray-600 hover:border-white text-white px-8 py-3.5 rounded-full font-semibold transition-all duration-300 ease-in-out">
+                            <i data-lucide="play" class="w-5 h-5"></i>
+                            Xem Demo
+                        </a>
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                        <div class="text-3xl font-bold text-white">3.500.000đ</div>
+                        <div class="text-xl text-gray-500 line-through">5.000.000đ</div>
+                        <div class="bg-red-500/20 text-red-500 border border-red-500/30 px-3 py-1 rounded-md text-sm font-bold animate__animated animate__pulse animate__infinite animate__slower">
+                            Giảm 30%
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content (Image) -->
+                <div class="w-full lg:w-[40%] observe-anim" data-animation="animate__fadeInRight">
+                    <div class="relative">
+                        <!-- Glow effect -->
+                        <div class="absolute inset-0 bg-primary/20 rounded-2xl blur-xl transform scale-105"></div>
+                        <!-- Image wrapper -->
+                        <div class="relative rounded-2xl overflow-hidden shadow-glow border border-gray-800">
+                            <!-- Overlay gradient -->
+                            <div class="absolute inset-0 bg-gradient-to-tr from-dark/60 via-transparent to-transparent z-10 pointer-events-none"></div>
+                            <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80" alt="Lập trình viên viết code" class="w-full h-[400px] object-cover transition-transform duration-700 hover:scale-105">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Below Hero -->
+            <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 pt-10 border-t border-gray-800">
+                <div class="bg-card rounded-2xl p-6 border border-gray-800 text-center observe-anim hover:-translate-y-1 transition-transform duration-300" data-animation="animate__fadeInUp">
+                    <div class="text-4xl font-bold text-primary mb-2 flex justify-center items-center">
+                        <span class="counter-target" data-target="16">0</span>
+                        <span>+</span>
+                    </div>
+                    <div class="text-gray-400 font-medium">Tiết học</div>
+                </div>
+                <div class="bg-card rounded-2xl p-6 border border-gray-800 text-center observe-anim hover:-translate-y-1 transition-transform duration-300" data-animation="animate__fadeInUp" style="animation-delay: 100ms;">
+                    <div class="text-4xl font-bold text-primary mb-2 flex justify-center items-center">
+                        <span class="counter-target" data-target="8">0</span>
+                    </div>
+                    <div class="text-gray-400 font-medium">Buổi thực chiến</div>
+                </div>
+                <div class="bg-card rounded-2xl p-6 border border-gray-800 text-center observe-anim hover:-translate-y-1 transition-transform duration-300" data-animation="animate__fadeInUp" style="animation-delay: 200ms;">
+                    <div class="text-4xl font-bold text-primary mb-2 flex justify-center items-center">
+                        <span class="counter-target" data-target="100">0</span>
+                        <span>%</span>
+                    </div>
+                    <div class="text-gray-400 font-medium">Deploy thực tế</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Vấn đề - Bạn đang gặp gì? -->
+    <section id="vande" class="py-20 bg-[#07080f]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 observe-anim" data-animation="animate__fadeInUp">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Bạn đang gặp những vấn đề nào?</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Trong kỷ nguyên AI, cách làm việc truyền thống đang dần trở nên kém hiệu quả.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-card p-8 rounded-2xl border border-gray-800 hover:border-primary hover:-translate-y-1 transition-all duration-300 ease-in-out observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 100ms;">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-primary mb-6">
+                        <i data-lucide="clock" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Viết code mất quá nhiều thời gian</h3>
+                    <p class="text-gray-400 leading-relaxed">Bạn phải gõ từng dòng code lặp đi lặp lại, tốn hàng giờ cho những tính năng cơ bản thay vì tập trung vào logic cốt lõi.</p>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="bg-card p-8 rounded-2xl border border-gray-800 hover:border-primary hover:-translate-y-1 transition-all duration-300 ease-in-out observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 200ms;">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-primary mb-6">
+                        <i data-lucide="puzzle" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Khó ghi nhớ cú pháp và thư viện phức tạp</h3>
+                    <p class="text-gray-400 leading-relaxed">Công nghệ thay đổi quá nhanh, việc phải đọc document liên tục làm gián đoạn luồng suy nghĩ và giảm hiệu suất.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-card p-8 rounded-2xl border border-gray-800 hover:border-primary hover:-translate-y-1 transition-all duration-300 ease-in-out observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 300ms;">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-primary mb-6">
+                        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Sợ làm hỏng code khi chỉnh sửa</h3>
+                    <p class="text-gray-400 leading-relaxed">Thiếu tự tin khi refactor code cũ hoặc thêm tính năng mới vì sợ ảnh hưởng đến các phần khác của hệ thống.</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-card p-8 rounded-2xl border border-gray-800 hover:border-primary hover:-translate-y-1 transition-all duration-300 ease-in-out observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 400ms;">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-primary mb-6">
+                        <i data-lucide="refresh-cw" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Muốn tự động hóa nhưng không biết bắt đầu từ đâu</h3>
+                    <p class="text-gray-400 leading-relaxed">Bạn biết AI có thể giúp sức, nhưng không biết cách setup quy trình làm việc chuẩn xác để AI hiểu và viết code đúng ý.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Giải pháp - Khóa học như câu trả lời -->
+    <section id="khoa-hoc" class="py-20 relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-dark to-dark -z-10"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 observe-anim" data-animation="animate__fadeInUp">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Giải Pháp Toàn Diện Cho Bạn</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Phương pháp tiếp cận AI-native development hoàn toàn mới.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- Sol 1 -->
+                <div class="bg-card/80 backdrop-blur-sm p-8 rounded-2xl border border-gray-800 text-center hover:border-primary/50 transition-colors duration-300 observe-anim" data-animation="animate__zoomIn" style="animation-delay: 100ms;">
+                    <div class="w-16 h-16 mx-auto bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6 transform rotate-3 hover:rotate-6 transition-transform">
+                        <i data-lucide="book-open" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Hướng dẫn từng bước chi tiết</h3>
+                    <p class="text-gray-400 text-sm">Lộ trình 8 buổi thực chiến rõ ràng, từ zero đến hero.</p>
+                </div>
+                <!-- Sol 2 -->
+                <div class="bg-card/80 backdrop-blur-sm p-8 rounded-2xl border border-gray-800 text-center hover:border-primary/50 transition-colors duration-300 observe-anim" data-animation="animate__zoomIn" style="animation-delay: 200ms;">
+                    <div class="w-16 h-16 mx-auto bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6 transform -rotate-3 hover:-rotate-6 transition-transform">
+                        <i data-lucide="laptop" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">16 tiết học thực hành</h3>
+                    <p class="text-gray-400 text-sm">Học qua làm (Learning by doing) với các bài tập thực tế.</p>
+                </div>
+                <!-- Sol 3 -->
+                <div class="bg-card/80 backdrop-blur-sm p-8 rounded-2xl border border-gray-800 text-center hover:border-primary/50 transition-colors duration-300 observe-anim" data-animation="animate__zoomIn" style="animation-delay: 300ms;">
+                    <div class="w-16 h-16 mx-auto bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6 transform rotate-3 hover:rotate-6 transition-transform">
+                        <i data-lucide="rocket" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Học từ dự án thực tế</h3>
+                    <p class="text-gray-400 text-sm">Cùng xây dựng ProjectOS - hệ thống quản lý chuẩn doanh nghiệp.</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <!-- Sol 4 -->
+                <div class="bg-card/80 backdrop-blur-sm p-8 rounded-2xl border border-gray-800 text-center hover:border-primary/50 transition-colors duration-300 observe-anim" data-animation="animate__zoomIn" style="animation-delay: 400ms;">
+                    <div class="w-16 h-16 mx-auto bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6 transform -rotate-3 hover:-rotate-6 transition-transform">
+                        <i data-lucide="film" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Video ghi lại toàn bộ</h3>
+                    <p class="text-gray-400 text-sm">Dễ dàng xem lại bài giảng bất cứ lúc nào, truy cập vĩnh viễn.</p>
+                </div>
+                <!-- Sol 5 -->
+                <div class="bg-card/80 backdrop-blur-sm p-8 rounded-2xl border border-gray-800 text-center hover:border-primary/50 transition-colors duration-300 observe-anim" data-animation="animate__zoomIn" style="animation-delay: 500ms;">
+                    <div class="w-16 h-16 mx-auto bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6 transform rotate-3 hover:rotate-6 transition-transform">
+                        <i data-lucide="users" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Cộng đồng & Group Hỗ trợ</h3>
+                    <p class="text-gray-400 text-sm">Giải đáp thắc mắc liên tục qua Group Zalo sau khóa học.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Đối tượng -->
+    <section class="py-20 bg-[#07080f]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 observe-anim" data-animation="animate__fadeInUp">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Khóa Học Dành Cho Ai?</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Không quan trọng bạn đang ở đâu, Claude Code sẽ giúp bạn bứt phá.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Target 1 -->
+                <div class="bg-card p-6 rounded-2xl border border-gray-800 flex flex-col sm:flex-row items-center sm:items-start gap-6 hover:border-primary/50 transition-all duration-300 hover:bg-gray-800/30 observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 100ms;">
+                    <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=64&h=64&fit=crop&q=80" alt="Sinh viên" class="w-16 h-16 rounded-full object-cover border-2 border-primary shrink-0">
+                    <div class="text-center sm:text-left">
+                        <div class="flex items-center justify-center sm:justify-start gap-2 mb-2 text-primary">
+                            <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                            <h3 class="text-lg font-bold text-white">Sinh viên năm 3-4 & Mới ra trường</h3>
+                        </div>
+                        <p class="text-gray-400 text-sm leading-relaxed">Xây dựng portfolio ấn tượng với dự án thực tế. Nhắm tới mức lương khởi điểm 10-15 triệu/tháng nhờ lợi thế AI.</p>
+                    </div>
+                </div>
+
+                <!-- Target 2 -->
+                <div class="bg-card p-6 rounded-2xl border border-gray-800 flex flex-col sm:flex-row items-center sm:items-start gap-6 hover:border-primary/50 transition-all duration-300 hover:bg-gray-800/30 observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 200ms;">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&q=80" alt="Người đi làm" class="w-16 h-16 rounded-full object-cover border-2 border-primary shrink-0">
+                    <div class="text-center sm:text-left">
+                        <div class="flex items-center justify-center sm:justify-start gap-2 mb-2 text-primary">
+                            <i data-lucide="briefcase" class="w-5 h-5"></i>
+                            <h3 class="text-lg font-bold text-white">Người đi làm muốn nâng cấp</h3>
+                        </div>
+                        <p class="text-gray-400 text-sm leading-relaxed">Dành cho Fresher, IT Support, Tester muốn chuyển mình sang vai trò Developer với tốc độ học nhanh nhất.</p>
+                    </div>
+                </div>
+
+                <!-- Target 3 -->
+                <div class="bg-card p-6 rounded-2xl border border-gray-800 flex flex-col sm:flex-row items-center sm:items-start gap-6 hover:border-primary/50 transition-all duration-300 hover:bg-gray-800/30 observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 300ms;">
+                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&q=80" alt="Non-tech" class="w-16 h-16 rounded-full object-cover border-2 border-primary shrink-0">
+                    <div class="text-center sm:text-left">
+                        <div class="flex items-center justify-center sm:justify-start gap-2 mb-2 text-primary">
+                            <i data-lucide="pen-tool" class="w-5 h-5"></i>
+                            <h3 class="text-lg font-bold text-white">Non-tech muốn tự xây sản phẩm</h3>
+                        </div>
+                        <p class="text-gray-400 text-sm leading-relaxed">PM, Designer, Entrepreneur không cần học code từ đầu vẫn có thể tự tay tạo ra MVP (Minimum Viable Product) để test thị trường.</p>
+                    </div>
+                </div>
+
+                <!-- Target 4 -->
+                <div class="bg-card p-6 rounded-2xl border border-gray-800 flex flex-col sm:flex-row items-center sm:items-start gap-6 hover:border-primary/50 transition-all duration-300 hover:bg-gray-800/30 observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 400ms;">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&q=80" alt="Developer" class="w-16 h-16 rounded-full object-cover border-2 border-primary shrink-0">
+                    <div class="text-center sm:text-left">
+                        <div class="flex items-center justify-center sm:justify-start gap-2 mb-2 text-primary">
+                            <i data-lucide="zap" class="w-5 h-5"></i>
+                            <h3 class="text-lg font-bold text-white">Developer muốn làm AI-native</h3>
+                        </div>
+                        <p class="text-gray-400 text-sm leading-relaxed">Đã có nền tảng vững, muốn bứt phá năng suất x10, học cách giao tiếp hiệu quả với AI để giải quyết bài toán phức tạp.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Chương trình - 8 Buổi -->
+    <section id="lo-trinh" class="py-20 relative">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 observe-anim" data-animation="animate__fadeInUp">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Chương Trình 8 Buổi</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Lộ trình được thiết kế tối ưu hóa thời gian, tập trung vào kỹ năng thực chiến.</p>
+            </div>
+            
+            <div class="relative timeline-border ml-4 md:ml-8 pl-8 md:pl-12 pb-4">
+                
+                <!-- Buổi 1 -->
+                <div class="relative mb-12 observe-anim" data-animation="animate__fadeInLeft" style="animation-delay: 150ms;">
+                    <div class="absolute -left-[49px] md:-left-[65px] top-0 w-8 h-8 rounded-full bg-card border-4 border-primary flex items-center justify-center text-xs font-bold shadow-glow-sm text-primary">
+                        1
+                    </div>
+                    <div class="bg-card p-6 rounded-xl border border-gray-800 hover:border-primary/30 transition-colors duration-300">
+                        <h3 class="text-xl font-bold mb-2">Làm quen Claude Code</h3>
+                        <p class="text-gray-400">Cài đặt, cấu hình môi trường phát triển & luồng làm việc cơ bản (Workflow) với AI.</p>
+                    </div>
+                </div>
+
+                <!-- Buổi 2 -->
+                <div class="relative mb-12 observe-anim" data-animation="animate__fadeInLeft" style="animation-delay: 300ms;">
+                    <div class="absolute -left-[49px] md:-left-[65px] top-0 w-8 h-8 rounded-full bg-card border-4 border-primary flex items-center justify-center text-xs font-bold shadow-glow-sm text-primary">
+                        2
+                    </div>
+                    <div class="bg-card p-6 rounded-xl border border-gray-800 hover:border-primary/30 transition-colors duration-300">
+                        <h3 class="text-xl font-bold mb-2">Prompt Engineering thực chiến</h3>
+                        <p class="text-gray-400">Nghệ thuật giao tiếp với Claude Code: Cách viết prompt chuẩn xác để AI sinh ra code đúng ý đồ kiến trúc.</p>
+                    </div>
+                </div>
+
+                <!-- Buổi 3 -->
+                <div class="relative mb-12 observe-anim" data-animation="animate__fadeInLeft" style="animation-delay: 450ms;">
+                    <div class="absolute -left-[49px] md:-left-[65px] top-0 w-8 h-8 rounded-full bg-card border-4 border-primary flex items-center justify-center text-xs font-bold shadow-glow-sm text-primary">
+                        3
+                    </div>
+                    <div class="bg-card p-6 rounded-xl border border-gray-800 hover:border-primary/30 transition-colors duration-300">
+                        <h3 class="text-xl font-bold mb-2">Thiết kế kiến trúc ứng dụng cùng AI</h3>
+                        <p class="text-gray-400">Phân tích yêu cầu bài toán (ProjectOS), lên ý tưởng Database Schema và thiết kế System Architecture.</p>
+                    </div>
+                </div>
+
+                <!-- Buổi 4 -->
+                <div class="relative mb-12 observe-anim" data-animation="animate__fadeInLeft" style="animation-delay: 600ms;">
+                    <div class="absolute -left-[49px] md:-left-[65px] top-0 w-8 h-8 rounded-full bg-card border-4 border-primary flex items-center justify-center text-xs font-bold shadow-glow-sm text-primary">
+                        4
+                    </div>
+                    <div class="bg-card p-6 rounded-xl border border-gray-800 hover:border-primary/30 transition-colors duration-300">
+                        <h3 class="text-xl font-bold mb-2">Xây dựng Backend với Firebase</h3>
+                        <p class="text-gray-400">Thiết lập Firebase Auth, Firestore Database, và viết các rules bảo mật cơ bản với sự trợ giúp của AI.</p>
+                    </div>
+                </div>
+
+                <!-- Buổi 5 -->
+                <div class="relative mb-12 observe-anim" data-animation="animate__fadeInLeft" style="animation-delay: 750ms;">
+                    <div class="absolute -left-[49px] md:-left-[65px] top-0 w-8 h-8 rounded-full bg-card border-4 border-primary flex items-center justify-center text-xs font-bold shadow-glow-sm text-primary">
+                        5
+                    </div>
+                    <div class="bg-card p-6 rounded-xl border border-gray-800 hover:border-primary/30 transition-colors duration-300">
+                        <h3 class="text-xl font-bold mb-2">Xây dựng Frontend — UI & Xử lý nghiệp vụ</h3>
+                        <p class="text-gray-400">Tạo giao diện người dùng bằng Next.js + TailwindCSS, kết nối với Firebase và xử lý các thao tác CRUD dữ liệu.</p>
+                    </div>
+                </div>
+
+                <!-- Buổi 6 -->
+                <div class="relative mb-12 observe-anim" data-animation="animate__fadeInLeft" style="animation-delay: 900ms;">
+                    <div class="absolute -left-[49px] md:-left-[65px] top-0 w-8 h-8 rounded-full bg-card border-4 border-primary flex items-center justify-center text-xs font-bold shadow-glow-sm text-primary">
+                        6
+                    </div>
+                    <div class="bg-card p-6 rounded-xl border border-gray-800 hover:border-primary/30 transition-colors duration-300">
+                        <h3 class="text-xl font-bold mb-2">Debug & Refactor cùng AI</h3>
+                        <p class="text-gray-400">Kỹ năng tìm và sửa lỗi nhanh chóng. Dùng AI để tối ưu hóa code (clean code) và cải thiện hiệu năng.</p>
+                    </div>
+                </div>
+
+                <!-- Buổi 7 -->
+                <div class="relative mb-12 observe-anim" data-animation="animate__fadeInLeft" style="animation-delay: 1050ms;">
+                    <div class="absolute -left-[49px] md:-left-[65px] top-0 w-8 h-8 rounded-full bg-card border-4 border-primary flex items-center justify-center text-xs font-bold shadow-glow-sm text-primary">
+                        7
+                    </div>
+                    <div class="bg-card p-6 rounded-xl border border-gray-800 hover:border-primary/30 transition-colors duration-300">
+                        <h3 class="text-xl font-bold mb-2">Tích hợp tính năng nâng cao</h3>
+                        <p class="text-gray-400">Thêm biểu đồ thống kê, xuất file Excel/PDF, phân quyền người dùng phức tạp trong ProjectOS.</p>
+                    </div>
+                </div>
+
+                <!-- Buổi 8 -->
+                <div class="relative observe-anim" data-animation="animate__fadeInLeft" style="animation-delay: 1200ms;">
+                    <div class="absolute -left-[49px] md:-left-[65px] top-0 w-8 h-8 rounded-full bg-primary border-4 border-primary flex items-center justify-center text-xs font-bold shadow-glow-sm text-white">
+                        8
+                    </div>
+                    <div class="bg-gradient-to-r from-card to-primary/10 p-6 rounded-xl border border-primary/50">
+                        <h3 class="text-xl font-bold mb-2 text-white">Deploy & Hoàn thiện sản phẩm trên Vercel</h3>
+                        <p class="text-gray-300">Cấu hình CI/CD, deploy ứng dụng Next.js lên Vercel. Tổng kết khóa học và định hướng con đường phát triển tiếp theo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Minh chứng - Sản phẩm học viên -->
+    <section id="hoc-vien" class="py-20 bg-[#07080f]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 observe-anim" data-animation="animate__fadeInUp">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Sản Phẩm Học Viên</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Sản phẩm thực tế được xây dựng 100% bằng Claude Code trong khuôn khổ 8 buổi học.</p>
+            </div>
+
+            <!-- Big Card -->
+            <div class="max-w-5xl mx-auto bg-card rounded-2xl border border-gray-800 shadow-2xl overflow-hidden mb-16 observe-anim" data-animation="animate__zoomIn">
+                <div class="relative h-[280px] md:h-[400px] overflow-hidden group">
+                    <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80" alt="Dashboard app" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute bottom-4 right-4 z-20 flex gap-2">
+                        <span class="bg-black/60 backdrop-blur text-white text-xs px-3 py-1 rounded-full border border-gray-600">Firebase</span>
+                        <span class="bg-black/60 backdrop-blur text-white text-xs px-3 py-1 rounded-full border border-gray-600">Next.js</span>
+                        <span class="bg-black/60 backdrop-blur text-white text-xs px-3 py-1 rounded-full border border-gray-600">Vercel</span>
+                        <span class="bg-black/60 backdrop-blur text-white text-xs px-3 py-1 rounded-full border border-gray-600">Tailwind</span>
+                    </div>
+                </div>
+                <div class="p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold text-white mb-1">ProjectOS</h3>
+                            <p class="text-primary font-medium text-sm">Enterprise Project Management</p>
+                        </div>
+                        <a href="#" class="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="external-link" class="w-4 h-4"></i>
+                            project-management.vercel.app
+                        </a>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed mb-6">
+                        Hệ thống quản lý dự án doanh nghiệp, hỗ trợ phân việc, theo dõi tiến độ, thống kê realtime và quản lý tài nguyên, được xây dựng hoàn toàn với Claude Code trong 8 buổi học.
+                    </p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-gray-800 pt-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-white flex items-center justify-center">
+                                <span class="counter-target" data-target="100">0</span>%
+                            </div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">Hoàn thành</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-white flex items-center justify-center">
+                                <span class="counter-target" data-target="8">0</span>
+                            </div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">Buổi thực chiến</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote -->
+            <div class="text-center mb-16 observe-anim" data-animation="animate__fadeIn">
+                <blockquote class="text-xl md:text-2xl font-medium italic text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                    "Lập trình viên tương lai không phải người viết code nhanh nhất.<br/>
+                    Họ là người biết <span class="text-primary">hướng dẫn AI tốt nhất</span>."
+                </blockquote>
+            </div>
+
+            <!-- Testimonials -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Testimonial 1 -->
+                <div class="bg-card p-6 rounded-2xl border border-gray-800 hover:border-primary/50 transition-all duration-300 observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 100ms;">
+                    <div class="flex items-center gap-4 mb-4">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&h=60&fit=crop&q=80" alt="Avatar" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <h4 class="font-bold text-white">Minh Anh</h4>
+                            <div class="flex text-yellow-500 w-4 h-4">
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">"Khóa học thay đổi hoàn toàn tư duy làm việc của mình. Từ chỗ mất 2 ngày để dựng một form quản lý, giờ mình chỉ cần 2 tiếng với Claude Code."</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-card p-6 rounded-2xl border border-gray-800 hover:border-primary/50 transition-all duration-300 observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 200ms;">
+                    <div class="flex items-center gap-4 mb-4">
+                        <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=60&h=60&fit=crop&q=80" alt="Avatar" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <h4 class="font-bold text-white">Hoàng Tuấn</h4>
+                            <div class="flex text-yellow-500 w-4 h-4">
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">"Mình là sinh viên năm 3, nhờ portfolio từ khóa học mà mình đã pass phỏng vấn vị trí Fresher Next.js dễ dàng."</p>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="bg-card p-6 rounded-2xl border border-gray-800 hover:border-primary/50 transition-all duration-300 observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 300ms;">
+                    <div class="flex items-center gap-4 mb-4">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&q=80" alt="Avatar" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <h4 class="font-bold text-white">Lan Phương</h4>
+                            <div class="flex text-yellow-500 w-4 h-4">
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                                <i data-lucide="star" class="fill-current w-4 h-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">"Background thiết kế nhưng mình đã tự tay code được trang landing page và dashboard quản lý nhờ sự hỗ trợ đắc lực của giảng viên và AI."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. Đăng ký -->
+    <section id="dang-ky" class="py-24 bg-gradient-to-b from-[#1A0E08] to-[#090A14] relative">
+        <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-10 observe-anim" data-animation="animate__fadeInUp">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Sẵn Sàng Bắt Đầu Chưa?</h2>
+                <p class="text-gray-400">Giữ chỗ ngay hôm nay để nhận ưu đãi giảm 30% học phí.</p>
+            </div>
+            
+            <div class="bg-card p-8 md:p-10 rounded-2xl border border-gray-800 shadow-2xl observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 100ms;">
+                <form id="registerForm" class="space-y-5" onsubmit="event.preventDefault(); alert('Đăng ký thành công!');">
+                    <div>
+                        <label for="fullname" class="block text-sm font-medium text-gray-300 mb-1">Họ và tên <span class="text-red-500">*</span></label>
+                        <input type="text" id="fullname" required class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-600" placeholder="Nguyễn Văn A">
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-600" placeholder="email@example.com">
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-300 mb-1">Số điện thoại <span class="text-gray-500 text-xs font-normal">(Không bắt buộc)</span></label>
+                        <input type="tel" id="phone" class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-600" placeholder="0901234567">
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-primary hover:bg-[#c95b28] text-white font-bold py-4 rounded-lg mt-4 transition-all duration-300 ease-in-out hover:shadow-glow-sm flex items-center justify-center gap-2 animate__animated pulse-delay">
+                        Đăng Ký Ngay
+                        <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    </button>
+                    
+                    <div class="pt-4 mt-4 border-t border-gray-800 text-center">
+                        <p class="text-sm text-gray-400 mb-3">Hoặc liên hệ trực tiếp với chúng tôi</p>
+                        <a href="tel:02363779779" class="inline-flex items-center justify-center gap-2 w-full bg-transparent border border-gray-600 hover:border-white text-white font-medium py-3 rounded-lg transition-all duration-300">
+                            <i data-lucide="phone" class="w-4 h-4"></i>
+                            Liên Hệ Hỗ Trợ: 0236.3.779.779
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. FAQ -->
+    <section id="faq" class="py-20 bg-dark">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 observe-anim" data-animation="animate__fadeInUp">
+                <h2 class="text-3xl font-bold mb-4">Câu Hỏi Thường Gặp</h2>
+                <p class="text-gray-400">Giải đáp thắc mắc của bạn về khóa học.</p>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="bg-card border border-gray-800 rounded-xl overflow-hidden observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 100ms;">
+                    <button class="faq-btn w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none hover:bg-gray-800/30 transition-colors">
+                        <span class="font-semibold text-lg">Tôi là người mới bắt đầu, có học được không?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="accordion-content bg-dark/50">
+                        <div class="px-6 pb-5 text-gray-400 leading-relaxed">
+                            Hoàn toàn được! Buổi 1-2 trang bị nền tảng từ đầu. Chỉ cần biết dùng máy tính cơ bản, phần còn lại Claude Code và giảng viên sẽ hỗ trợ bạn.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="bg-card border border-gray-800 rounded-xl overflow-hidden observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 200ms;">
+                    <button class="faq-btn w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none hover:bg-gray-800/30 transition-colors">
+                        <span class="font-semibold text-lg">Khóa này dành cho những ai?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="accordion-content bg-dark/50">
+                        <div class="px-6 pb-5 text-gray-400 leading-relaxed">
+                            Sinh viên IT, Fresher, PM/Designer/Entrepreneur muốn tự xây sản phẩm, Developer muốn làm AI-native development để tăng năng suất x10.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="bg-card border border-gray-800 rounded-xl overflow-hidden observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 300ms;">
+                    <button class="faq-btn w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none hover:bg-gray-800/30 transition-colors">
+                        <span class="font-semibold text-lg">Tôi mất bao lâu để hoàn thành?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="accordion-content bg-dark/50">
+                        <div class="px-6 pb-5 text-gray-400 leading-relaxed">
+                            4 tuần, 8 buổi, mỗi buổi 2 tiết. Sau khóa học bạn sẽ có một sản phẩm hoàn chỉnh deploy lên Vercel.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="bg-card border border-gray-800 rounded-xl overflow-hidden observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 400ms;">
+                    <button class="faq-btn w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none hover:bg-gray-800/30 transition-colors">
+                        <span class="font-semibold text-lg">Có hỗ trợ sau khi học không?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="accordion-content bg-dark/50">
+                        <div class="px-6 pb-5 text-gray-400 leading-relaxed">
+                            Có. Bạn sẽ được tham gia Group Zalo hỗ trợ trong 3 tháng sau khóa học, đồng thời có video bài giảng để truy cập vĩnh viễn.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 5 -->
+                <div class="bg-card border border-gray-800 rounded-xl overflow-hidden observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 500ms;">
+                    <button class="faq-btn w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none hover:bg-gray-800/30 transition-colors">
+                        <span class="font-semibold text-lg">Nếu không hài lòng thì sao?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="accordion-content bg-dark/50">
+                        <div class="px-6 pb-5 text-gray-400 leading-relaxed">
+                            Cam kết hoàn 100% học phí nếu bạn không hài lòng sau buổi học đầu tiên (vui lòng báo lại cho trung tâm trong vòng 24h sau buổi học).
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 6 -->
+                <div class="bg-card border border-gray-800 rounded-xl overflow-hidden observe-anim" data-animation="animate__fadeInUp" style="animation-delay: 600ms;">
+                    <button class="faq-btn w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none hover:bg-gray-800/30 transition-colors">
+                        <span class="font-semibold text-lg">Tôi có quyền truy cập vĩnh viễn không?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="accordion-content bg-dark/50">
+                        <div class="px-6 pb-5 text-gray-400 leading-relaxed">
+                            Có. Toàn bộ Video + tài liệu + source code đều có thể tải về và sử dụng mãi mãi, không hết hạn.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. Footer -->
+    <footer class="bg-footer border-t border-gray-800 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+                <!-- Cột 1: Brand -->
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=48&q=80" alt="Logo" class="w-8 h-8 rounded object-cover">
+                        <h3 class="text-xl font-bold text-white tracking-tight">Claude Code</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Khóa học AI-native development tại Softech Aptech Đà Nẵng. Đồng hành cùng bạn trên con đường chinh phục công nghệ mới.
+                    </p>
+                </div>
+                
+                <!-- Cột 2: Liên hệ -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Liên hệ</h4>
+                    <ul class="space-y-3 text-gray-400 text-sm">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="map-pin" class="w-4 h-4 mt-0.5 shrink-0"></i>
+                            <span>24 Lê Thánh Tôn, Đà Nẵng</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="phone" class="w-4 h-4 shrink-0"></i>
+                            <span>0236.3.779.779</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="mail" class="w-4 h-4 shrink-0"></i>
+                            <span>info@softech.vn</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Cột 3: Socials -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Kết nối</h4>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:bg-gray-800 hover:scale-110 transition-all duration-200">
+                            <i data-lucide="facebook" class="w-5 h-5"></i>
+                        </a>
+                        <!-- Zalo custom icon via message-circle since no zalo specific icon in standard lucide -->
+                        <a href="#" class="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:bg-gray-800 hover:scale-110 transition-all duration-200">
+                            <i data-lucide="message-circle" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:bg-gray-800 hover:scale-110 transition-all duration-200">
+                            <i data-lucide="linkedin" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:bg-gray-800 hover:scale-110 transition-all duration-200">
+                            <i data-lucide="youtube" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cột 4: Newsletter -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Bản tin</h4>
+                    <p class="text-gray-400 text-sm mb-4">Nhận tips Claude Code miễn phí hàng tuần.</p>
+                    <form onsubmit="event.preventDefault();" class="flex">
+                        <input type="email" placeholder="Email của bạn" class="bg-gray-900 border border-gray-800 text-white px-4 py-2 rounded-l-md w-full focus:outline-none focus:border-primary text-sm">
+                        <button type="submit" class="bg-primary hover:bg-[#c95b28] px-4 py-2 rounded-r-md text-white transition-colors duration-300">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 mt-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-500 text-sm">© 2026 Softech Aptech Đà Nẵng. All rights reserved.</p>
+                <div class="flex gap-4 text-sm text-gray-500">
+                    <a href="#" class="hover:text-white transition-colors">Điều khoản</a>
+                    <a href="#" class="hover:text-white transition-colors">Bảo mật</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navbar scroll effect
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('bg-dark/95', 'backdrop-blur-md', 'shadow-md', 'border-b', 'border-gray-800');
+                    navbar.classList.remove('bg-transparent');
+                } else {
+                    navbar.classList.remove('bg-dark/95', 'backdrop-blur-md', 'shadow-md', 'border-b', 'border-gray-800');
+                    navbar.classList.add('bg-transparent');
+                }
+            });
+
+            // Mobile menu toggle
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = mobileBtn.querySelector('i');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+
+            function toggleMenu() {
+                mobileMenu.classList.toggle('hidden');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    menuIcon.style.transform = 'rotate(90deg)';
+                } else {
+                    menuIcon.style.transform = 'rotate(0)';
+                }
+            }
+
+            mobileBtn.addEventListener('click', toggleMenu);
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', toggleMenu);
+            });
+
+            // Counter Animation Function
+            function startCounter(el) {
+                const target = parseInt(el.getAttribute('data-target'));
+                const duration = 2000; // 2 seconds
+                const fps = 60;
+                const totalFrames = (duration / 1000) * fps;
+                const step = target / totalFrames;
+                let current = 0;
+                
+                const update = () => {
+                    current += step;
+                    if (current >= target) {
+                        el.innerText = target;
+                    } else {
+                        el.innerText = Math.floor(current);
+                        requestAnimationFrame(update);
+                    }
+                };
+                update();
+            }
+
+            // Intersection Observer for Animations and Counters
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = entry.target;
+                        
+                        // Handle generic animations
+                        const animClass = target.getAttribute('data-animation');
+                        if (animClass) {
+                            target.classList.add('animate__animated', animClass);
+                            target.classList.remove('observe-anim'); // Remove opacity-0 rule
+                        }
+                        
+                        // Handle counter
+                        if (target.classList.contains('counter-target')) {
+                            startCounter(target);
+                            target.classList.remove('counter-target'); // ensure it only runs once
+                        }
+                        
+                        // Unobserve after animating (optional, keeps it one-time)
+                        observer.unobserve(target);
+                    }
+                });
+            }, observerOptions);
+
+            // Select elements to observe
+            document.querySelectorAll('.observe-anim, .counter-target').forEach(el => {
+                observer.observe(el);
+            });
+
+            // FAQ Accordion Logic
+            const faqBtns = document.querySelectorAll('.faq-btn');
+            faqBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const content = btn.nextElementSibling;
+                    const icon = btn.querySelector('i');
+                    const isOpen = content.classList.contains('open');
+
+                    // Close all others
+                    document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('open'));
+                    document.querySelectorAll('.faq-btn i').forEach(i => i.style.transform = 'rotate(0deg)');
+
+                    // Toggle current
+                    if (!isOpen) {
+                        content.classList.add('open');
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
